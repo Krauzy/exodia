@@ -2,13 +2,12 @@
  
  # 🔮 EXODIA `CLI`
  
- A simple and easy method to deploy a NFT
+<small>A CLI to detect vulnerabilities and exploit them. Exodia is the game over ;)</small>
  
  <br/>
  
  ![demo](https://github.com/Krauzy/exodia/blob/main/demo.png)
 
- <small>A CLI to detect vulnerabilities and exploit them. Exodia is the game over ;)</small>
 </div>
 
 # Tools
