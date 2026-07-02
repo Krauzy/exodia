@@ -1,23 +1,15 @@
 {
   "name": "exodia",
-  "version": "1.0.0",
-  "description": "A CLI to detect vulnerabilities and exploit them. Exodia is the game over ;)",
-  "main": "index.js",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "start": "node ./index.js"
-  },
-  "bin": {
-    "exodia": "./bin/index.js"
-  },
-  "type": "module",
-  "author": "Krauzy",
-  "license": "MIT",
-  "dependencies": {
-    "axios": "^1.7.7",
-    "chalk": "^5.3.0",
-    "commander": "^12.1.0",
-    "figlet": "^1.8.0",
-    "inquirer": "^12.0.0",
-    "ora": "^8.1.0"
+    "backend": "cd backend && .\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8765",
+    "backend:test": "cd backend && .\\.venv\\Scripts\\python.exe -m pytest",
+    "backend:lint": "cd backend && .\\.venv\\Scripts\\python.exe -m ruff check .",
+    "backend:typecheck": "cd backend && .\\.venv\\Scripts\\python.exe -m mypy app",
+    "frontend": "npm --prefix frontend run dev",
+    "electron": "npm --prefix frontend run electron:dev",
+    "frontend:build": "npm --prefix frontend run build",
+    "build": "npm --prefix frontend run electron:dist"
   }
 }

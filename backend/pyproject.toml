@@ -1,0 +1,41 @@
+[project]
+name = "exodia-backend"
+version = "0.1.0"
+description = "Local defensive audit API for Exodia"
+requires-python = ">=3.12"
+dependencies = [
+  "alembic>=1.14.0",
+  "fastapi>=0.115.6",
+  "httpx>=0.28.1",
+  "loguru>=0.7.3",
+  "pydantic>=2.10.3",
+  "pydantic-settings>=2.7.0",
+  "sqlalchemy>=2.0.36",
+  "uvicorn[standard]>=0.34.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.13.0",
+  "pyinstaller>=6.11.1",
+  "pytest>=8.3.4",
+  "pytest-asyncio>=0.25.0",
+  "ruff>=0.8.4",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = []
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
