@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import auth, events, health, modules, pentest, reports, scans, settings, sre, targets
@@ -12,6 +12,19 @@ from app.core.logging import configure_logging
 from app.database.session import init_db
 from app.plugins.loader import load_local_plugins
 from app.plugins.registry import module_registry
+
+API_ROUTERS: tuple[APIRouter, ...] = (
+    health.router,
+    auth.router,
+    modules.router,
+    targets.router,
+    scans.router,
+    events.router,
+    reports.router,
+    sre.router,
+    pentest.router,
+    settings.router,
+)
 
 
 @asynccontextmanager
@@ -39,16 +52,14 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    app.include_router(health.router)
-    app.include_router(auth.router)
-    app.include_router(modules.router)
-    app.include_router(targets.router)
-    app.include_router(scans.router)
-    app.include_router(events.router)
-    app.include_router(reports.router)
-    app.include_router(sre.router)
-    app.include_router(pentest.router)
-    app.include_router(settings.router)
+    api_prefix = settings_obj.api_prefix.rstrip("/")
+    for router in API_ROUTERS:
+        app.include_router(router, prefix=api_prefix)
+
+    if not api_prefix:
+        for router in API_ROUTERS:
+            app.include_router(router, prefix="/api", include_in_schema=False)
+
     return app
 
 
