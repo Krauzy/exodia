@@ -10,9 +10,11 @@ from typing import Any
 from sqlalchemy.orm import Session, selectinload
 
 from app.core.logging import app_logger
-from app.database.models import Finding, ModuleExecutionLog, Scan
+from app.database.models import CustomModule, Finding, ModuleExecutionLog, Scan
 from app.database.session import SessionLocal
 from app.jobs.schemas import ScanEvent
+from app.modules.base import SecurityModule
+from app.modules.custom_interceptor import CustomInterceptorModule, custom_id_from_module_id
 from app.plugins.registry import module_registry
 from app.schemas.common import risk_score_for_severities
 
@@ -87,7 +89,7 @@ class JobManager:
                 await self._publish_and_log(db, scan_id, "scan_started", "Scan started", None)
 
                 for module_id in scan.modules:
-                    module = module_registry.get(module_id)
+                    module = _resolve_module(db, scan.user_id, module_id)
                     if module is None:
                         await self._publish_and_log(
                             db,
@@ -237,3 +239,18 @@ class JobManager:
 
 
 job_manager = JobManager()
+
+
+def _resolve_module(db: Session, user_id: str | None, module_id: str) -> SecurityModule | None:
+    module = module_registry.get(module_id)
+    if module is not None:
+        return module
+    custom_id = custom_id_from_module_id(module_id)
+    if custom_id is None or user_id is None:
+        return None
+    custom = (
+        db.query(CustomModule)
+        .filter(CustomModule.id == custom_id, CustomModule.user_id == user_id, CustomModule.active.is_(True))
+        .one_or_none()
+    )
+    return CustomInterceptorModule(custom) if custom is not None else None

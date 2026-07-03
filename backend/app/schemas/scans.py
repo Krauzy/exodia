@@ -23,6 +23,7 @@ class ScanCreate(BaseModel):
 
 class ScanRead(BaseModel):
     id: str
+    user_id: str | None
     target_id: str
     modules: list[str]
     status: str

@@ -1,6 +1,14 @@
 export type TargetType = "web" | "api" | "host";
 export type ScanStatus = "pending" | "running" | "completed" | "failed" | "canceled";
 export type Severity = "info" | "low" | "medium" | "high" | "critical";
+export type PentestModuleId =
+  | "rate_limit"
+  | "cors_reflection"
+  | "jwt_in_url"
+  | "entity_enumeration"
+  | "clickjacking"
+  | "sql_injection"
+  | "idor";
 
 export interface HealthStatus {
   status: string;
@@ -8,8 +16,21 @@ export interface HealthStatus {
   version: string;
 }
 
+export interface User {
+  id: string;
+  username: string;
+  created_at: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  token_type: "bearer";
+  user: User;
+}
+
 export interface Target {
   id: string;
+  user_id: string | null;
   name: string;
   target_type: TargetType;
   value: string;
@@ -26,6 +47,7 @@ export interface ModuleInfo {
   name: string;
   description: string;
   category: string;
+  tags: string[];
   default_severity: Severity;
   parameters: Array<{
     name: string;
@@ -35,6 +57,18 @@ export interface ModuleInfo {
     default: unknown;
     description: string;
   }>;
+}
+
+export interface CustomModule {
+  id: string;
+  module_id: string;
+  name: string;
+  title: string;
+  description: string;
+  severity: Severity;
+  tags: string[];
+  code: string;
+  active: boolean;
 }
 
 export interface Finding {
@@ -51,6 +85,7 @@ export interface Finding {
 
 export interface Scan {
   id: string;
+  user_id: string | null;
   target_id: string;
   modules: string[];
   status: ScanStatus;
@@ -65,6 +100,7 @@ export interface Scan {
 
 export interface Report {
   id: string;
+  user_id: string | null;
   scan_id: string;
   format: "html" | "markdown" | "json";
   content: string;
@@ -119,6 +155,33 @@ export interface SreCheckResponse {
     error: string | null;
   } | null;
   probes: SreProbe[];
+}
+
+export interface PentestFinding {
+  title: string;
+  severity: Severity;
+  detail: string;
+  evidence: Record<string, unknown>;
+  recommendation: string;
+}
+
+export interface PentestProbe {
+  id: PentestModuleId;
+  name: string;
+  status: "pass" | "warn" | "fail";
+  severity: Severity;
+  summary: string;
+  latency_ms: number;
+  evidence: Record<string, unknown>;
+  findings: PentestFinding[];
+}
+
+export interface PentestCheckResponse {
+  url: string;
+  checked_at: string;
+  score: number;
+  overall_risk: Severity;
+  probes: PentestProbe[];
 }
 
 declare global {

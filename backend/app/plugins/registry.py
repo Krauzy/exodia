@@ -1,9 +1,19 @@
 from __future__ import annotations
 
 from app.modules.base import SecurityModule
+from app.modules.pentest import (
+    ClickjackingModule,
+    CorsReflectionModule,
+    EntityEnumerationModule,
+    IdorReviewModule,
+    JwtInUrlModule,
+    RateLimitModule,
+    SqlInjectionExposureModule,
+)
 from app.modules.port_probe import SafePortProbe
 from app.modules.robots_checker import RobotsTxtChecker
 from app.modules.security_txt_checker import SecurityTxtChecker
+from app.modules.sre import SreDnsModule, SreHttpModule, SreLatencyModule, SreRedirectModule, SreTlsModule
 from app.modules.tech_fingerprint import TechnologyFingerprint
 from app.modules.tls_analyzer import TlsAnalyzer
 from app.modules.web_headers import WebSecurityHeadersAnalyzer
@@ -43,8 +53,19 @@ def build_default_registry() -> ModuleRegistry:
     registry.register(SecurityTxtChecker())
     registry.register(TechnologyFingerprint())
     registry.register(SafePortProbe())
+    registry.register(RateLimitModule())
+    registry.register(CorsReflectionModule())
+    registry.register(JwtInUrlModule())
+    registry.register(EntityEnumerationModule())
+    registry.register(ClickjackingModule())
+    registry.register(SqlInjectionExposureModule())
+    registry.register(IdorReviewModule())
+    registry.register(SreDnsModule())
+    registry.register(SreHttpModule())
+    registry.register(SreLatencyModule())
+    registry.register(SreRedirectModule())
+    registry.register(SreTlsModule())
     return registry
 
 
 module_registry = build_default_registry()
-

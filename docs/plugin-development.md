@@ -55,3 +55,16 @@ def register(registry):
 - Do not implement stealth, evasion, credential theft, destructive payloads, or exploitation.
 - Validate options and use timeouts for network operations.
 
+## UI-Created Interceptor Modules
+
+The Modules page can create user-owned interceptor modules without writing plugin files. The code must define one
+function:
+
+```python
+def analyze(request, response):
+    return []
+```
+
+The backend performs the HTTP request and passes immutable request/response objects to the function. The validator
+rejects imports, dunder access, dynamic execution, unsafe builtins, class definitions, and top-level statements outside
+`analyze`.

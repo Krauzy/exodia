@@ -9,7 +9,6 @@ export type AppView =
   | "scan-running"
   | "scan-results"
   | "reports"
-  | "sre"
   | "modules"
   | "settings"
   | "about";

@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { PlayCircle } from "lucide-react";
+import { PlayCircle, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
+import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
 import { SectionHeader } from "../../components/ui/SectionHeader";
 import { useModules, useTargets } from "../../hooks/useApiQueries";
@@ -19,8 +20,27 @@ export function NewScanPage() {
   const openScan = useAppStore((state) => state.openScan);
   const [targetId, setTargetId] = useState(selectedTargetId ?? "");
   const [selectedModules, setSelectedModules] = useState<string[]>(["web_headers"]);
+  const [moduleQuery, setModuleQuery] = useState("");
   const [authorized, setAuthorized] = useState(false);
   const activeTargets = useMemo(() => targets.data?.filter((target) => target.active) ?? [], [targets.data]);
+  const filteredModules = useMemo(() => {
+    const needle = moduleQuery.trim().toLowerCase();
+    if (!needle) return modules.data ?? [];
+    return (modules.data ?? []).filter((module) =>
+      [
+        module.id,
+        module.name,
+        module.description,
+        module.category,
+        module.default_severity,
+        ...module.tags,
+        ...module.parameters.map((parameter) => parameter.name),
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(needle),
+    );
+  }, [moduleQuery, modules.data]);
   const mutation = useMutation({
     mutationFn: () =>
       api.createScan({
@@ -85,8 +105,16 @@ export function NewScanPage() {
             <h2 className="text-lg font-semibold text-zinc-50">Modules</h2>
             <Badge>{selectedModules.length} selected</Badge>
           </div>
+          <div className="mb-4 flex items-center gap-2">
+            <Search className="h-4 w-4 text-cyan-300" />
+            <Input
+              value={moduleQuery}
+              onChange={(event) => setModuleQuery(event.target.value)}
+              placeholder="Search modules by name, tag, category, severity, or parameter"
+            />
+          </div>
           <div className="grid gap-3 md:grid-cols-2">
-            {modules.data?.map((module) => {
+            {filteredModules.map((module) => {
               const checked = selectedModules.includes(module.id);
               return (
                 <button
@@ -105,15 +133,22 @@ export function NewScanPage() {
                   <p className="line-clamp-3 text-sm leading-6 text-zinc-400">{module.description}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Badge>{module.category}</Badge>
+                    {module.tags.map((tag) => (
+                      <Badge key={tag}>{tag}</Badge>
+                    ))}
                     <Badge severity={module.default_severity}>{module.default_severity}</Badge>
                   </div>
                 </button>
               );
             })}
+            {!filteredModules.length ? (
+              <p className="rounded-md border border-zinc-800 bg-zinc-950 p-4 text-sm text-zinc-500 md:col-span-2">
+                No modules matched the current search.
+              </p>
+            ) : null}
           </div>
         </Card>
       </div>
     </>
   );
 }
-

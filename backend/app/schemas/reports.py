@@ -21,10 +21,10 @@ class ReportGenerateRequest(BaseModel):
 
 class ReportRead(BaseModel):
     id: str
+    user_id: str | None
     scan_id: str
     format: str
     content: str
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
-

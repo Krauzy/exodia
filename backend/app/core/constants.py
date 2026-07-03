@@ -16,7 +16,7 @@ SEVERITY_SCORES = {
 
 DEFAULT_SAFE_PORTS = [22, 80, 443, 5432, 6379, 8080, 8443]
 DEFAULT_HTTP_TIMEOUT_SECONDS = 8.0
-MAX_SCAN_MODULES = 12
+MAX_SCAN_MODULES = 32
 MAX_TAGS = 12
 
 AUTHORIZED_USE_DISCLAIMER = (
@@ -24,4 +24,3 @@ AUTHORIZED_USE_DISCLAIMER = (
     "It performs defensive checks and does not include exploit, evasion, "
     "persistence, credential theft, or destructive capabilities."
 )
-

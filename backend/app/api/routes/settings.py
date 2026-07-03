@@ -3,13 +3,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.api.dependencies import db_session
+from app.api.dependencies import current_user, db_session
 from app.core.config import get_settings
-from app.database.models import AppSettings
+from app.database.models import AppSettings, User
 from app.schemas.settings import SettingsRead, SettingsUpdate
 
 router = APIRouter(prefix="/settings", tags=["settings"])
 DbSession = Annotated[Session, Depends(db_session)]
+CurrentUser = Annotated[User, Depends(current_user)]
 
 
 SETTINGS_KEY = "app"
@@ -26,7 +27,7 @@ def _defaults() -> SettingsRead:
 
 
 @router.get("", response_model=SettingsRead)
-def get_app_settings(db: DbSession) -> SettingsRead:
+def get_app_settings(db: DbSession, user: CurrentUser) -> SettingsRead:
     row = db.get(AppSettings, SETTINGS_KEY)
     defaults = _defaults().model_dump()
     if row is None:
@@ -36,8 +37,8 @@ def get_app_settings(db: DbSession) -> SettingsRead:
 
 
 @router.put("", response_model=SettingsRead)
-def update_app_settings(payload: SettingsUpdate, db: DbSession) -> SettingsRead:
-    current = get_app_settings(db).model_dump()
+def update_app_settings(payload: SettingsUpdate, db: DbSession, user: CurrentUser) -> SettingsRead:
+    current = get_app_settings(db, user).model_dump()
     current.update(payload.model_dump(exclude_unset=True, exclude_none=True))
     row = db.get(AppSettings, SETTINGS_KEY)
     if row is None:
