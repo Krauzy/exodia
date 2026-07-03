@@ -9,13 +9,24 @@ npm install
 npm run dev
 ```
 
+Log in or register from the first screen. The frontend stores the bearer token in local storage and sends it to the
+backend for targets, scans, reports, SRE checks, and Pentest checks.
+
 Run the desktop shell:
 
 ```bash
 npm run electron:dev
 ```
 
-The Electron main process starts the Python backend at `127.0.0.1:8765` and stops it when the app closes.
+The renderer reads `VITE_API_BASE_URL`; copy `.env.example` to `.env` when the API is hosted outside the default
+`http://127.0.0.1:8765`.
+
+The Electron main process starts the Python backend at `127.0.0.1:8765` only when no external backend URL is
+configured. To use an already running backend, set `EXODIA_BACKEND_URL` and run:
+
+```bash
+npm run electron:external
+```
 
 ## Installers
 

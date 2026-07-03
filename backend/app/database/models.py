@@ -22,6 +22,7 @@ class Target(Base):
     __tablename__ = "targets"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid_str)
+    user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
     name: Mapped[str] = mapped_column(String(160), nullable=False)
     target_type: Mapped[str] = mapped_column(String(16), nullable=False)
     value: Mapped[str] = mapped_column(String(512), nullable=False)
@@ -32,13 +33,30 @@ class Target(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
 
+    user: Mapped[User | None] = relationship(back_populates="targets")
     scans: Mapped[list[Scan]] = relationship(back_populates="target", cascade="all, delete-orphan")
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid_str)
+    username: Mapped[str] = mapped_column(String(80), unique=True, index=True, nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(240), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
+
+    targets: Mapped[list[Target]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    scans: Mapped[list[Scan]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    reports: Mapped[list[Report]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    custom_modules: Mapped[list[CustomModule]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
 
 class Scan(Base):
     __tablename__ = "scans"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid_str)
+    user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
     target_id: Mapped[str] = mapped_column(ForeignKey("targets.id", ondelete="CASCADE"), nullable=False)
     modules: Mapped[list[str]] = mapped_column(JSON, default=list)
     status: Mapped[str] = mapped_column(String(24), default="pending")
@@ -49,6 +67,7 @@ class Scan(Base):
     authorization_confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
+    user: Mapped[User | None] = relationship(back_populates="scans")
     target: Mapped[Target] = relationship(back_populates="scans")
     findings: Mapped[list[Finding]] = relationship(back_populates="scan", cascade="all, delete-orphan")
     logs: Mapped[list[ModuleExecutionLog]] = relationship(back_populates="scan", cascade="all, delete-orphan")
@@ -75,11 +94,13 @@ class Report(Base):
     __tablename__ = "reports"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid_str)
+    user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
     scan_id: Mapped[str] = mapped_column(ForeignKey("scans.id", ondelete="CASCADE"), nullable=False)
     format: Mapped[str] = mapped_column(String(24), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
+    user: Mapped[User | None] = relationship(back_populates="reports")
     scan: Mapped[Scan] = relationship(back_populates="reports")
 
 
@@ -103,3 +124,21 @@ class AppSettings(Base):
     key: Mapped[str] = mapped_column(String(120), primary_key=True)
     value: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
+
+
+class CustomModule(Base):
+    __tablename__ = "custom_modules"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uuid_str)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    name: Mapped[str] = mapped_column(String(80), nullable=False)
+    title: Mapped[str] = mapped_column(String(160), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    severity: Mapped[str] = mapped_column(String(16), nullable=False)
+    tags: Mapped[list[str]] = mapped_column(JSON, default=list)
+    code: Mapped[str] = mapped_column(Text, nullable=False)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
+
+    user: Mapped[User] = relationship(back_populates="custom_modules")

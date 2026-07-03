@@ -6,7 +6,10 @@ import { app } from "electron";
 
 const BACKEND_PORT = Number(process.env.EXODIA_BACKEND_PORT ?? "8765");
 const BACKEND_HOST = "127.0.0.1";
-const BACKEND_URL = `http://${BACKEND_HOST}:${BACKEND_PORT}`;
+const LOCAL_BACKEND_URL = `http://${BACKEND_HOST}:${BACKEND_PORT}`;
+const CONFIGURED_BACKEND_URL = process.env.EXODIA_BACKEND_URL || process.env.VITE_API_BASE_URL;
+const BACKEND_URL = CONFIGURED_BACKEND_URL || LOCAL_BACKEND_URL;
+const SHOULD_MANAGE_BACKEND = !CONFIGURED_BACKEND_URL;
 
 let backendProcess: ChildProcessWithoutNullStreams | undefined;
 
@@ -14,11 +17,19 @@ export function getBackendUrl() {
   return BACKEND_URL;
 }
 
+export function isBackendManaged() {
+  return SHOULD_MANAGE_BACKEND;
+}
+
 function sqliteUrl(filePath: string) {
   return `sqlite:///${filePath.replace(/\\/g, "/")}`;
 }
 
 export function startBackend() {
+  if (!SHOULD_MANAGE_BACKEND) {
+    return undefined;
+  }
+
   if (backendProcess && !backendProcess.killed) {
     return backendProcess;
   }

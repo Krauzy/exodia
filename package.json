@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "backend": "cd backend && .\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8765",
+    "backend:host": "cd backend && .\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8765",
     "backend:test": "cd backend && .\\.venv\\Scripts\\python.exe -m pytest",
     "backend:lint": "cd backend && .\\.venv\\Scripts\\python.exe -m ruff check .",
     "backend:typecheck": "cd backend && .\\.venv\\Scripts\\python.exe -m mypy app",
     "frontend": "npm --prefix frontend run dev",
+    "frontend:host": "npm --prefix frontend run dev:host",
     "electron": "npm --prefix frontend run electron:dev",
     "frontend:build": "npm --prefix frontend run build",
     "build": "npm --prefix frontend run electron:dist"

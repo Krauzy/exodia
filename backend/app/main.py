@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import events, health, modules, reports, scans, settings, sre, targets
+from app.api.routes import auth, events, health, modules, pentest, reports, scans, settings, sre, targets
 from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.database.session import init_db
@@ -33,19 +33,21 @@ def create_app() -> FastAPI:
     )
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings_obj.allowed_origins + ["http://127.0.0.1:5173"],
+        allow_origins=settings_obj.allowed_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
     app.include_router(health.router)
+    app.include_router(auth.router)
     app.include_router(modules.router)
     app.include_router(targets.router)
     app.include_router(scans.router)
     app.include_router(events.router)
     app.include_router(reports.router)
     app.include_router(sre.router)
+    app.include_router(pentest.router)
     app.include_router(settings.router)
     return app
 

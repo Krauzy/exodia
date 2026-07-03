@@ -18,6 +18,7 @@ class SecurityModule(ABC):
     name: str
     description: str
     category: str
+    tags: list[str] = []
     default_severity: Severity = Severity.info
     parameters: list[ModuleParameter] = []
 
@@ -27,6 +28,7 @@ class SecurityModule(ABC):
             name=self.name,
             description=self.description,
             category=self.category,
+            tags=self.tags,
             default_severity=self.default_severity,
             parameters=self.parameters,
         )
@@ -41,4 +43,3 @@ class HttpObservation(BaseModel):
     status_code: int | None = None
     headers: dict[str, str] = Field(default_factory=dict)
     body_preview: str = ""
-

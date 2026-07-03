@@ -3,14 +3,18 @@ import { fileURLToPath } from "node:url";
 
 import { app, BrowserWindow, shell } from "electron";
 
-import { getBackendUrl, startBackend, stopBackend, waitForBackend } from "./backend-process.js";
+import { getBackendUrl, isBackendManaged, startBackend, stopBackend, waitForBackend } from "./backend-process.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function createWindow() {
+  process.env.EXODIA_BACKEND_URL = getBackendUrl();
   startBackend();
-  await waitForBackend();
+  const backendReady = await waitForBackend(isBackendManaged() ? 15_000 : 5_000);
+  if (!backendReady) {
+    console.warn(`[backend] ${getBackendUrl()} did not respond before the UI loaded`);
+  }
 
   const window = new BrowserWindow({
     width: 1440,
@@ -33,7 +37,6 @@ async function createWindow() {
     return { action: "deny" };
   });
 
-  process.env.EXODIA_BACKEND_URL = getBackendUrl();
   if (process.env.VITE_DEV_SERVER_URL) {
     await window.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
@@ -59,4 +62,3 @@ app.on("activate", () => {
     createWindow();
   }
 });
-

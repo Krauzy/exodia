@@ -1,10 +1,11 @@
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { Eye, Plus } from "lucide-react";
-import { useMemo } from "react";
+import { Eye, Plus, Search } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
+import { Input } from "../../components/ui/Input";
 import { SectionHeader } from "../../components/ui/SectionHeader";
 import { useTargets } from "../../hooks/useApiQueries";
 import { formatDate } from "../../lib/utils";
@@ -15,6 +16,7 @@ export function TargetsPage() {
   const targets = useTargets();
   const openTarget = useAppStore((state) => state.openTarget);
   const setView = useAppStore((state) => state.setView);
+  const [query, setQuery] = useState("");
   const columns = useMemo<ColumnDef<Target>[]>(
     () => [
       {
@@ -50,8 +52,26 @@ export function TargetsPage() {
     ],
     [openTarget],
   );
+  const filteredTargets = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    if (!needle) return targets.data ?? [];
+    return (targets.data ?? []).filter((target) =>
+      [
+        target.name,
+        target.target_type,
+        target.value,
+        target.description,
+        target.authorization_scope,
+        target.active ? "active" : "inactive",
+        ...target.tags,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(needle),
+    );
+  }, [query, targets.data]);
   const table = useReactTable({
-    data: targets.data ?? [],
+    data: filteredTargets,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -69,6 +89,14 @@ export function TargetsPage() {
         }
       />
       <Card>
+        <div className="mb-4 flex items-center gap-2">
+          <Search className="h-4 w-4 text-cyan-300" />
+          <Input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search targets by name, URL, type, tag, status, or scope"
+          />
+        </div>
         <div className="overflow-hidden rounded-md border border-zinc-800">
           <table className="w-full text-left text-sm">
             <thead className="bg-zinc-900 text-xs uppercase text-zinc-500">

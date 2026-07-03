@@ -29,6 +29,8 @@ Exodia is a defensive local audit tool. The default posture is safe mode.
 - Targets require validated URL, host, or IP input.
 - Web/API targets only allow `http` and `https`.
 - Scans require explicit authorization confirmation.
+- User authentication is required for targets, scans, reports, settings, and active check endpoints.
+- Targets, scan history, and reports are scoped to the authenticated user.
 - Built-in modules avoid command execution.
 - Safe Port Probe only checks a small default port list.
 - HTTP requests use timeouts.
@@ -38,4 +40,3 @@ Exodia is a defensive local audit tool. The default posture is safe mode.
 ## Plugin Boundary
 
 Plugins are local Python modules loaded from a configured folder. Exodia does not download plugin code from the internet. Operators must review plugin code before enabling it.
-

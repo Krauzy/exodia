@@ -64,6 +64,41 @@ npm run frontend
 npm run electron
 ```
 
+## Authentication
+
+Exodia now uses local user authentication. Register or log in from the desktop/web UI before creating targets or
+running scans. Targets, scan history, findings, logs, and reports are scoped to the authenticated user.
+
+The backend exposes:
+
+- `POST /auth/register`
+- `POST /auth/login`
+- `GET /auth/me`
+
+## Separate Frontend and Backend Instances
+
+The backend and frontend can run independently. The frontend reads `VITE_API_BASE_URL`, and Electron reads
+`EXODIA_BACKEND_URL`; when that Electron variable is set, it does not spawn a local Python backend.
+
+```bash
+npm run backend:host
+```
+
+```bash
+cd frontend
+VITE_API_BASE_URL=http://127.0.0.1:8765 npm run dev:host
+```
+
+For Electron against an already running backend:
+
+```bash
+cd frontend
+EXODIA_BACKEND_URL=http://127.0.0.1:8765 npm run electron:external
+```
+
+When the frontend is hosted on a different origin, set `EXODIA_ALLOWED_ORIGINS` on the backend as a JSON list,
+for example `["https://app.example.com"]`.
+
 ## Build
 
 ```bash
@@ -99,19 +134,24 @@ docs/       Architecture, security model, plugin docs, authorized-use policy
 - Security.txt Checker
 - Technology Fingerprint
 - Safe Port Probe
+- Pentest modules tagged `PENTEST`: rate limit, CORS reflected Origin, JWT in URL, entity enumeration, clickjacking, SQL Injection exposure, and IDOR review.
+- SRE modules tagged `SRE`: DNS, HTTP availability, latency budget, redirect behavior, and TLS health.
 
-## SRE Check
+## Custom Interceptor Modules
 
-The SRE section performs a controlled site verification for authorized services:
+Authenticated users can create custom modules from the Modules page. A custom module runs as a normal scan module
+tagged `CUSTOM`. Its Python code must define:
 
-- DNS resolution and latency.
-- HTTP reachability, status code, redirects, content type, and server header.
-- TLS protocol, issuer, expiration, and certificate validity for HTTPS.
-- Simple operational score with `healthy`, `degraded`, or `down` status.
+```python
+def analyze(request, response):
+    return []
+```
+
+The backend performs the HTTP request, passes safe request/response objects into the function, validates the AST,
+and blocks imports, filesystem access, dynamic execution, dunder access, and unsafe builtins.
 
 ## Roadmap
 
-- Add packaged Python runtime discovery for production builds.
 - Add report file persistence and signed report metadata.
 - Add richer target ownership evidence fields.
 - Add module option forms per plugin.
