@@ -1,0 +1,127 @@
+{
+  "$schema": "./schemas/exodia-agent.schema.json",
+  "id": "exodia-specialist",
+  "name": "Exodia Project Specialist",
+  "version": "1.0.0",
+  "description": "Specialized coding agent configuration for Exodia, a defensive audit platform with FastAPI backend, React/Electron frontend, scan modules, reports, and Vercel services.",
+  "primaryLanguage": "pt-BR",
+  "repository": {
+    "name": "exodia",
+    "root": ".",
+    "backend": "backend",
+    "frontend": "frontend",
+    "docs": "docs"
+  },
+  "mission": [
+    "Preserve Exodia as an authorized defensive audit console.",
+    "Keep backend and frontend independently deployable.",
+    "Keep scan modules safe, bounded, observable, and user-scoped.",
+    "Use local context RAG before broad exploration, then verify source directly."
+  ],
+  "contextRags": [
+    {
+      "id": "project-context",
+      "type": "lexical-file-rag",
+      "indexPath": ".agents/context/index.json",
+      "searchCommand": "powershell -NoProfile -ExecutionPolicy Bypass -File .agents/scripts/search-context.ps1 -Query \"<query>\" -Top 5",
+      "scope": ".agents/context/*.md",
+      "refreshPolicy": "Update the affected context document and index keywords whenever architecture, routes, modules, deployment, commands, or safety boundaries change."
+    },
+    {
+      "id": "source-verification",
+      "type": "live-source-rag",
+      "entrypoints": [
+        "backend/app/main.py",
+        "backend/app/api/routes",
+        "backend/app/jobs/manager.py",
+        "backend/app/modules",
+        "frontend/src/app/App.tsx",
+        "frontend/src/services/api.ts",
+        "frontend/src/features",
+        "frontend/electron"
+      ],
+      "refreshPolicy": "Always inspect live source after reading cached context and before editing."
+    },
+    {
+      "id": "shared-memory",
+      "type": "codex-memory",
+      "source": "C:/Users/Trbry/.codex/memories",
+      "usage": "Consult only when the task depends on prior project conventions, agent setup patterns, or user preferences."
+    }
+  ],
+  "startupChecklist": [
+    "Run powershell -NoProfile -ExecutionPolicy Bypass -File .agents/scripts/search-context.ps1 with task-specific keywords.",
+    "Read the top returned context chunks.",
+    "Run rg against the live source paths identified by the context.",
+    "Check git status before editing.",
+    "Choose tests based on backend, frontend, packaging, or deployment blast radius."
+  ],
+  "safetyBoundaries": [
+    "Authorized targets only.",
+    "No credential theft, phishing, malware, persistence, stealth, evasion, reverse shells, destructive payloads, or exploit chaining.",
+    "Pentest modules must remain bounded signal checks and must not perform brute-force credential guessing.",
+    "Custom interceptor modules must keep AST validation and safe builtins restrictions."
+  ],
+  "validationCommands": {
+    "backendLint": "npm.cmd run backend:lint",
+    "backendTypecheck": "npm.cmd run backend:typecheck",
+    "backendTests": "npm.cmd run backend:test",
+    "frontendBuild": "npm.cmd run frontend:build",
+    "ragList": "powershell -NoProfile -ExecutionPolicy Bypass -File .agents/scripts/search-context.ps1 -List",
+    "ragQuery": "powershell -NoProfile -ExecutionPolicy Bypass -File .agents/scripts/search-context.ps1 -Query \"auth scan modules\" -Top 5"
+  },
+  "changeRouting": [
+    {
+      "area": "backend-api",
+      "readFirst": [
+        ".agents/context/backend-map.md",
+        "backend/app/api/routes",
+        "backend/app/schemas",
+        "backend/app/database/models.py"
+      ],
+      "validateWith": [
+        "npm.cmd run backend:lint",
+        "npm.cmd run backend:typecheck",
+        "npm.cmd run backend:test"
+      ]
+    },
+    {
+      "area": "frontend-ui",
+      "readFirst": [
+        ".agents/context/frontend-map.md",
+        "frontend/src/app/App.tsx",
+        "frontend/src/services/api.ts",
+        "frontend/src/features"
+      ],
+      "validateWith": [
+        "npm.cmd run frontend:build"
+      ]
+    },
+    {
+      "area": "scan-modules",
+      "readFirst": [
+        ".agents/context/backend-map.md",
+        ".agents/context/security-and-authorization.md",
+        "backend/app/modules",
+        "backend/app/jobs/manager.py"
+      ],
+      "validateWith": [
+        "npm.cmd run backend:lint",
+        "npm.cmd run backend:test"
+      ]
+    },
+    {
+      "area": "deployment",
+      "readFirst": [
+        ".agents/context/runtime-deployment.md",
+        "docker-compose.yml",
+        "vercel.json",
+        "frontend/electron"
+      ],
+      "validateWith": [
+        "npm.cmd run frontend:build",
+        "npm.cmd run backend:test"
+      ]
+    }
+  ]
+}

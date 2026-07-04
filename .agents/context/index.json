@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "project": "exodia",
+  "description": "Local context index for Exodia agents. Query with .agents/scripts/search-context.ps1 before broad source exploration.",
+  "documents": [
+    {
+      "id": "project-overview",
+      "title": "Project Overview",
+      "path": "project-overview.md",
+      "tags": ["overview", "features", "architecture", "safety"],
+      "keywords": ["exodia", "defensive audit", "features", "modules", "sre", "pentest", "reports", "electron", "fastapi", "react"]
+    },
+    {
+      "id": "backend-map",
+      "title": "Backend Map",
+      "path": "backend-map.md",
+      "tags": ["backend", "api", "database", "scan-jobs", "modules"],
+      "keywords": ["fastapi", "routes", "sqlalchemy", "models", "jobmanager", "eventbus", "modules", "custom module", "reports", "tests"]
+    },
+    {
+      "id": "frontend-map",
+      "title": "Frontend Map",
+      "path": "frontend-map.md",
+      "tags": ["frontend", "react", "electron", "ui", "api-client"],
+      "keywords": ["vite", "react", "electron", "sidebar", "authpage", "targets", "scans", "modulespage", "reports", "zustand", "react query"]
+    },
+    {
+      "id": "security-and-authorization",
+      "title": "Security And Authorization Context",
+      "path": "security-and-authorization.md",
+      "tags": ["security", "auth", "authorization", "safe-mode", "custom-modules"],
+      "keywords": ["authorized use", "bearer token", "user ownership", "eventsource token", "custom interceptor", "ast validation", "safe builtins", "pentest"]
+    },
+    {
+      "id": "runtime-deployment",
+      "title": "Runtime And Deployment Context",
+      "path": "runtime-deployment.md",
+      "tags": ["runtime", "deployment", "docker", "vercel", "electron"],
+      "keywords": ["npm run backend", "vite", "uvicorn", "docker compose", "vercel services", "api rewrite", "sqlite", "EXODIA_DATABASE_URL", "VITE_API_BASE_URL"]
+    },
+    {
+      "id": "validation-runbook",
+      "title": "Validation Runbook",
+      "path": "validation-runbook.md",
+      "tags": ["validation", "tests", "build", "commands"],
+      "keywords": ["backend lint", "mypy", "pytest", "frontend build", "npm.cmd", "health", "rag validation", "powershell"]
+    },
+    {
+      "id": "rag-maintenance",
+      "title": "RAG Maintenance",
+      "path": "rag-maintenance.md",
+      "tags": ["rag", "context", "maintenance", "retrieval"],
+      "keywords": ["context index", "lexical rag", "search-context", "diacritics", "synonyms", "verify source", "maintenance"]
+    }
+  ]
+}
